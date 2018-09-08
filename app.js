@@ -1,4 +1,5 @@
 const express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 var path = require('path');
 var firebase = require ('firebase');
@@ -14,45 +15,61 @@ var config = {
 };
 firebase.initializeApp(config);
 
-//Get elements
-const txtEmail = document.getElementById('txtEmail');
-const txtPassword = document.getElementById('txtPassword');
-const loginbutton = document.getElementById('loginbutton');
-const signupbutton = document.getElementById('signupbutton');
+//Middleware
+app.use(bodyParser.urlencoded({extended:true}));
 
-//Add login event
-loginbutton.addEventListener('click', e =>{
-    const email = txtEmail.value;
-    const pass = txtPassword.value;
-    const auth = firebase.auth();
-    //Sign in sfsdf
-    const promise = auth.signInWithEmailAndPassword(email,password);
+//HTML endpoint(recieving data from html)
+app.post('/register', function(req,res){
+    const txtEmail = req.body.email;
+    const password = req.body.password;
 
-    promise.catch(e=>console.log(e.message)); 
+    firebase.auth().createUserWithEmailAndPassword(txtEmail, password)
+    .then(function(firbaseUser){
+        console.log(firbaseUser);
 
-});
-//Add sign up event
-signupbutton.addEventListener('click', e =>{
-    const email = txtEmail.value;
-    const pass = txtPassword.value;
-    const auth = firebase.auth();
+    })
+    .catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // ...
+        console.log(errorMessage);
+      });
 
-    //Sign in 
-    const promise = auth.createUserWithEmailAndPassword(email,pass);
+})
+
+app.post('/login', function(req,res){
+    const txtEmail = req.body.email;
+    const password = req.body.password;
+
+    console.log('IN LOGIN');
+    var promise = firebase.auth().signInWithEmailAndPassword(txtEmail,password);
+
     promise
-        .then(user=> console.log())
-        .catch(e=> console.log(e.message));
+    .then(function(user){
+        //console.log(user);
+        console.log('logged in');
+        res.redirect('/logged');
+    })
+    .catch(e=>console.log(e.message)); 
+
+    
+
+})
+
+app.get('/logged',(req,res)=>{
+    res.sendFile('loggedin.html',{root: path.join(__dirname,'./files')})
 });
 
 //Add a user
-firebase.auth().onAuthStateChanged(firebaseUser => {
-    if(firebaseUser){
-        console.log(firebaseUser);
-    }
-    else{
-        console.log('cannot log in');
-    }
-});
+// firebase.auth().onAuthStateChanged(firebaseUser => {
+//     if(firebaseUser){
+//         //console.log(firebaseUser);
+//     }
+//     else{
+//         console.log('cannot log in');
+//     }
+// });
 
 app.get('/',(req,res)=>{
     res.sendFile('index.html',{root: path.join(__dirname,'./files')})
