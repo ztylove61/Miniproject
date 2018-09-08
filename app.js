@@ -14,45 +14,45 @@ var config = {
 };
 firebase.initializeApp(config);
 
-// //Get elements
-// const txtEmail = document.getElementById('txtEmail');
-// const txtPassword = document.getElementById('txtPassword');
-// const loginbutton = document.getElementById('loginbutton');
-// const signupbutton = document.getElementById('signupbutton');
+//Get elements
+const txtEmail = document.getElementById('txtEmail');
+const txtPassword = document.getElementById('txtPassword');
+const loginbutton = document.getElementById('loginbutton');
+const signupbutton = document.getElementById('signupbutton');
 
-// //Add login event
-// loginbutton.addEventListener('click', e =>{
-//     const email = txtEmail.value;
-//     const pass = txtPassword.value;
-//     const auth = firebase.auth();
-//     //Sign in 
-//     const promise = auth.signInWithEmailAndPassword(email,password);
+//Add login event
+loginbutton.addEventListener('click', e =>{
+    const email = txtEmail.value;
+    const pass = txtPassword.value;
+    const auth = firebase.auth();
+    //Sign in sfsdf
+    const promise = auth.signInWithEmailAndPassword(email,password);
 
-//     promise.catch(e=>console.log(e.message)); 
+    promise.catch(e=>console.log(e.message)); 
 
-// });
-// //Add sign up event
-// signupbutton.addEventListener('click', e =>{
-//     const email = txtEmail.value;
-//     const pass = txtPassword.value;
-//     const auth = firebase.auth();
+});
+//Add sign up event
+signupbutton.addEventListener('click', e =>{
+    const email = txtEmail.value;
+    const pass = txtPassword.value;
+    const auth = firebase.auth();
 
-//     //Sign in 
-//     const promise = auth.createUserWithEmailAndPassword(email,pass);
-//     promise
-//         .then(user=> console.log())
-//         .catch(e=> console.log(e.message));
-// });
+    //Sign in 
+    const promise = auth.createUserWithEmailAndPassword(email,pass);
+    promise
+        .then(user=> console.log())
+        .catch(e=> console.log(e.message));
+});
 
-// //Add a user
-// firebase.auth().onAuthStateChanged(firebaseUser => {
-//     if(firebaseUser){
-//         console.log(firebaseUser);
-//     }
-//     else{
-//         console.log('cannot log in');
-//     }
-// });
+//Add a user
+firebase.auth().onAuthStateChanged(firebaseUser => {
+    if(firebaseUser){
+        console.log(firebaseUser);
+    }
+    else{
+        console.log('cannot log in');
+    }
+});
 
 app.get('/',(req,res)=>{
     res.sendFile('index.html',{root: path.join(__dirname,'./files')})
