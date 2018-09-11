@@ -17,6 +17,7 @@ var config = {
 };
 firebase.initializeApp(config);
 
+app.use(express.static(__dirname + '/files'));
 //Middleware
 app.use(bodyParser.urlencoded({extended:true}));
 
@@ -24,7 +25,8 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.post('/registered', function(req,res){
     const txtEmail = req.body.email;
     const password = req.body.password;
-
+    console.log(txtEmail);
+    console.log(password);
     firebase.auth().createUserWithEmailAndPassword(txtEmail, password)
     .then(function(firbaseUser){
         console.log(firbaseUser);
@@ -34,10 +36,10 @@ app.post('/registered', function(req,res){
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
+        
         // ...
         console.log(errorMessage);
-       
-     
+            
       });
 
 })
@@ -55,29 +57,27 @@ app.post('/login', function(req,res){
         console.log('logged in');
         res.redirect('/logged');
     })
-    .catch(e=>console.log(e.message)); 
-
-    
+    .catch(e=>console.log(e.message));     
 
 })
 
 //physical website
 app.get('/logged',(req,res)=>{
-    res.sendFile('loggedin.html',{root: path.join(__dirname,'./files')})
+    res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
 });
 
-//Listen to auth state changes
-firebase.auth().onAuthStateChanged(firebaseUser => {
-    if(firebaseUser){
-        console.log("firebaseUser signed in");
-    }
-    else{
-        console.log('cannot log in');
-    }
-});
+// //Listen to auth state changes
+// firebase.auth().onAuthStateChanged(firebaseUser => {
+//     if(firebaseUser){
+//         console.log("firebaseUser signed in");
+//     }
+//     else{
+//         console.log('cannot log in');
+//     }
+// });
 
 app.get('/',(req,res)=>{
-    res.sendFile('index.html',{root: path.join(__dirname,'./files')})
+    res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')})
 });
 
 app.listen(3000,() => {
