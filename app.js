@@ -3,6 +3,8 @@ var bodyParser = require('body-parser');
 var app = express();
 var path = require('path');
 var firebase = require ('firebase');
+var router = express.Router();
+
 
 // Initialize Firebase
 var config = {
@@ -19,14 +21,14 @@ firebase.initializeApp(config);
 app.use(bodyParser.urlencoded({extended:true}));
 
 //HTML endpoint(recieving data from html)
-app.post('/register', function(req,res){
+app.post('/registered', function(req,res){
     const txtEmail = req.body.email;
     const password = req.body.password;
 
     firebase.auth().createUserWithEmailAndPassword(txtEmail, password)
     .then(function(firbaseUser){
         console.log(firbaseUser);
-
+        res.redirect('/logged')
     })
     .catch(function(error) {
         // Handle Errors here.
@@ -34,6 +36,8 @@ app.post('/register', function(req,res){
         var errorMessage = error.message;
         // ...
         console.log(errorMessage);
+       
+     
       });
 
 })
@@ -57,19 +61,20 @@ app.post('/login', function(req,res){
 
 })
 
+//physical website
 app.get('/logged',(req,res)=>{
     res.sendFile('loggedin.html',{root: path.join(__dirname,'./files')})
 });
 
-//Add a user
-// firebase.auth().onAuthStateChanged(firebaseUser => {
-//     if(firebaseUser){
-//         //console.log(firebaseUser);
-//     }
-//     else{
-//         console.log('cannot log in');
-//     }
-// });
+//Listen to auth state changes
+firebase.auth().onAuthStateChanged(firebaseUser => {
+    if(firebaseUser){
+        console.log("firebaseUser signed in");
+    }
+    else{
+        console.log('cannot log in');
+    }
+});
 
 app.get('/',(req,res)=>{
     res.sendFile('index.html',{root: path.join(__dirname,'./files')})
