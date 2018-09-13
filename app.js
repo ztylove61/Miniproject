@@ -4,6 +4,7 @@ var app = express();
 var path = require('path');
 var firebase = require ('firebase');
 var router = express.Router();
+//var database = firebase.database();
 
 
 // Initialize Firebase
@@ -16,10 +17,34 @@ var config = {
     messagingSenderId: "357963499894"
 };
 firebase.initializeApp(config);
-
-app.use(express.static(__dirname + '/files'));
+app.use(express.static(__dirname + '/files')); // USING CSS files in project
 //Middleware
 app.use(bodyParser.urlencoded({extended:true}));
+
+/*
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./miniproject-35c0c-firebase-adminsdk-l7ec7-89f99871ca.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://miniproject-35c0c.firebaseio.com"
+});
+
+var db = admin.database();
+var ref = db.ref("server/saving-data/fireblog");
+var userRef = ref.child("users");
+
+userRef.set({
+    email:"hi@bu.edu",
+    password:"1234567",
+    temp:"35 degree",
+    humidity:"70%"
+});
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
+
 
 //HTML endpoint(recieving data from html)
 app.post('/registered', function(req,res){
@@ -30,13 +55,12 @@ app.post('/registered', function(req,res){
     firebase.auth().createUserWithEmailAndPassword(txtEmail, password)
     .then(function(firbaseUser){
         console.log(firbaseUser);
-        res.redirect('/logged')
+        //res.redirect('/signup')
     })
     .catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
-        
         // ...
         console.log(errorMessage);
             
@@ -64,6 +88,10 @@ app.post('/login', function(req,res){
 //physical website
 app.get('/logged',(req,res)=>{
     res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
+});
+
+app.get('/signup',(req,res)=>{
+    res.sendFile('SignUp.html',{root: path.join(__dirname,'./files/html')})
 });
 
 // //Listen to auth state changes
