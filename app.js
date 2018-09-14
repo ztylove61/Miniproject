@@ -21,7 +21,7 @@ app.use(express.static(__dirname + '/files')); // USING CSS files in project
 //Middleware
 app.use(bodyParser.urlencoded({extended:true}));
 
-/*
+
 var admin = require("firebase-admin");
 
 var serviceAccount = require("./miniproject-35c0c-firebase-adminsdk-l7ec7-89f99871ca.json");
@@ -42,7 +42,7 @@ userRef.set({
     humidity:"70%"
 });
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
+
 
 
 
@@ -55,7 +55,6 @@ app.post('/registered', function(req,res){
     firebase.auth().createUserWithEmailAndPassword(txtEmail, password)
     .then(function(firbaseUser){
         console.log(firbaseUser);
-        //res.redirect('/signup')
     })
     .catch(function(error) {
         // Handle Errors here.
@@ -72,6 +71,8 @@ app.post('/login', function(req,res){
     const txtEmail = req.body.email;
     const password = req.body.password;
 
+    console.log(txtEmail,password);
+
     console.log('IN LOGIN');
     var promise = firebase.auth().signInWithEmailAndPassword(txtEmail,password);
 
@@ -79,9 +80,24 @@ app.post('/login', function(req,res){
     .then(function(user){
         //console.log(user);
         console.log('logged in');
-        res.redirect('/logged');
+        //res.redirect('/logged');
     })
-    .catch(e=>console.log(e.message));     
+    .catch(e=>console.log('error')); 
+    
+    firebase.auth().onAuthStateChanged(firebaseUser => {
+        if(firebaseUser){
+            firebaseUser.getIdToken().then(function(data) {
+                console.log(data)
+              });
+            console.log("firebaseUser signed in");
+            res.redirect('/logged');
+        }
+        else{
+            console.log('cannot log in');
+        }
+    });
+    
+    
 
 })
 
@@ -94,15 +110,8 @@ app.get('/signup',(req,res)=>{
     res.sendFile('SignUp.html',{root: path.join(__dirname,'./files/html')})
 });
 
-// //Listen to auth state changes
-// firebase.auth().onAuthStateChanged(firebaseUser => {
-//     if(firebaseUser){
-//         console.log("firebaseUser signed in");
-//     }
-//     else{
-//         console.log('cannot log in');
-//     }
-// });
+//Listen to auth state changes
+
 
 app.get('/',(req,res)=>{
     res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')})
