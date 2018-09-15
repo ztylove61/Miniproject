@@ -4,7 +4,13 @@ var app = express();
 var path = require('path');
 var firebase = require ('firebase');
 var router = express.Router();
-//var database = firebase.database();
+var admin = require("firebase-admin");
+var cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+var session = require('express-session');
+const secret = 'secret';
+
+
 
 
 // Initialize Firebase
@@ -20,9 +26,13 @@ firebase.initializeApp(config);
 app.use(express.static(__dirname + '/files')); // USING CSS files in project
 //Middleware
 app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(session({secret:"feaiosajfdklne1240",resave: false, saveUninitialized:true}));
 
 
-var admin = require("firebase-admin");
+
+//Initialize Admin SDK
 
 var serviceAccount = require("./miniproject-35c0c-firebase-adminsdk-l7ec7-89f99871ca.json");
 
@@ -31,22 +41,11 @@ admin.initializeApp({
   databaseURL: "https://miniproject-35c0c.firebaseio.com"
 });
 
-var db = admin.database();
-var ref = db.ref("server/saving-data/fireblog");
-var userRef = ref.child("users");
 
-userRef.set({
-    email:"hi@bu.edu",
-    password:"1234567",
-    temp:"35 degree",
-    humidity:"70%"
-});
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-
-
-//HTML endpoint(recieving data from html)
+//Sign Up
 app.post('/registered', function(req,res){
     const txtEmail = req.body.email;
     const password = req.body.password;
@@ -55,69 +54,88 @@ app.post('/registered', function(req,res){
     firebase.auth().createUserWithEmailAndPassword(txtEmail, password)
     .then(function(firbaseUser){
         console.log(firbaseUser);
+        res.redirect('/logged')
     })
     .catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
-        // ...
         console.log(errorMessage);
             
       });
 
 })
 
+//Sign In
 app.post('/login', function(req,res){
     const txtEmail = req.body.email;
     const password = req.body.password;
-
     console.log(txtEmail,password);
-
     console.log('IN LOGIN');
+    
     var promise = firebase.auth().signInWithEmailAndPassword(txtEmail,password);
-
     promise
     .then(function(user){
-        //console.log(user);
-        console.log('logged in');
-        //res.redirect('/logged');
+        console.log('logged in')
+            let expirationDate = Math.floor(Date.now()/1000)+30;
+            var token = jwt.sign({userID:txtEmail, exp:expirationDate},secret);
+            console.log(token);
+           
+        res.redirect('/logged')
     })
-    .catch(e=>console.log('error')); 
+    .catch(e=>console.log(e))
     
-    firebase.auth().onAuthStateChanged(firebaseUser => {
-        if(firebaseUser){
-            firebaseUser.getIdToken().then(function(data) {
-                console.log(data)
-              });
-            console.log("firebaseUser signed in");
-            res.redirect('/logged');
-        }
-        else{
-            console.log('cannot log in');
-        }
-    });
-    
-    
+        
+});
 
-})
+    
 
 //physical website
+
 app.get('/logged',(req,res)=>{
-    res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
+    firebase.auth().onAuthStateChanged(firebaseUser => {
+        if(firebaseUser){
+            console.log('confirmed');
+            //res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
+                
+        }
+        else{
+            res.redirect('/');
+        }
+})
 });
+
 
 app.get('/signup',(req,res)=>{
     res.sendFile('SignUp.html',{root: path.join(__dirname,'./files/html')})
 });
 
+
 //Listen to auth state changes
 
 
 app.get('/',(req,res)=>{
+    
     res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')})
 });
+
+
+app.get('/logout',function(res,req){
+    var sessionCookie = req.cookies.session||'';
+    res.clearCookie('session');
+    admin.auth().verifySessionCookie(sessionCookie)
+    .then((decodedClaims)=>{
+    return admin.auth().revokeRefreshTokens(decodedClaims.sub)
+    })
+    .then(()=>{
+        res.redirect('/logged');
+    })
+    .catch((error)=>{
+        res.redirect('/logged');
+    })
+    
+})
 
 app.listen(3000,() => {
     console.log('Starting on port 3000');
 });
-
