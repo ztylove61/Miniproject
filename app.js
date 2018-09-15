@@ -23,13 +23,33 @@ var config = {
     messagingSenderId: "357963499894"
 };
 firebase.initializeApp(config);
-app.use(express.static(__dirname + '/files')); // USING CSS files in project
+
+
 //Middleware
+app.use(cookieParser());
+app.use(express.static(__dirname + '/files')); // USING CSS files in project
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
-app.use(cookieParser());
-app.use(session({secret:"feaiosajfdklne1240",resave: false, saveUninitialized:true}));
+//app.use(session({secret:"feaiosajfdklne1240",resave: false, saveUninitialized:true}));
 
+var stateCheck = (req,res,next)=> {
+
+    firebase.auth().onAuthStateChanged(firebaseUser => {
+        if(firebaseUser){
+               
+            // let expirationDate = Math.floor(Date.now()/1000)+30;
+            console.log('confirmed');
+            res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
+            
+        }
+        else{
+            console.log('logged out');
+            res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')});
+            
+        }
+    })
+    next();
+}
 
 
 //Initialize Admin SDK
@@ -77,10 +97,17 @@ app.post('/login', function(req,res){
     promise
     .then(function(user){
         console.log('logged in')
-            let expirationDate = Math.floor(Date.now()/1000)+30;
-            var token = jwt.sign({userID:txtEmail, exp:expirationDate},secret);
+        var token = jwt.sign({userID:txtEmail},secret,{ expiresIn: '1h' });
+        res.cookie('token',token);
+            var isExpiredToken = false;
+            var dateNow = new Date();
             console.log(token);
-           
+            if(token.expiresIn < dateNow.getTime()/1000)
+            {
+                isExpiredToken = true;
+                console.log("Exipred");
+                res.redirect('/');
+            }
         res.redirect('/logged')
     })
     .catch(e=>console.log(e))
@@ -88,21 +115,50 @@ app.post('/login', function(req,res){
         
 });
 
+app.post('/logout',function(req,res){
+
+    firebase.auth().signOut().then(function() {
+        console.log('Signed Out');
+        res.clearCookie('token');
+        res.redirect('/');
+      }, function(error) {
+        console.error('Sign Out Error', error);
+      });
+      
+    /*firebase.auth().signOut()
+    .then(function(firebaseUser) {
+
+        console.log('signed out');
+        res.redirect('/');
+        
+    })
+    .catch(function(error){
+        
+        console.log('failed sign out')
+
+    })*/
+
+    //res.redirect('/');
+
+});
     
-
-//physical website
-
 app.get('/logged',(req,res)=>{
-    firebase.auth().onAuthStateChanged(firebaseUser => {
-        if(firebaseUser){
+
+    console.log('token',req.cookies);
+    jwt.verify(req.cookies.token, 'secret', function(err, decoded) {
+        // err
+        if(err){
+
+            console.log('logged out');
+            res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')});
+            
+        }else{
             console.log('confirmed');
-            //res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
-                
+            res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
         }
-        else{
-            res.redirect('/');
-        }
-})
+        // decoded undefined
+      });
+
 });
 
 
@@ -115,26 +171,9 @@ app.get('/signup',(req,res)=>{
 
 
 app.get('/',(req,res)=>{
-    
     res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')})
 });
 
-
-app.get('/logout',function(res,req){
-    var sessionCookie = req.cookies.session||'';
-    res.clearCookie('session');
-    admin.auth().verifySessionCookie(sessionCookie)
-    .then((decodedClaims)=>{
-    return admin.auth().revokeRefreshTokens(decodedClaims.sub)
-    })
-    .then(()=>{
-        res.redirect('/logged');
-    })
-    .catch((error)=>{
-        res.redirect('/logged');
-    })
-    
-})
 
 app.listen(3000,() => {
     console.log('Starting on port 3000');
