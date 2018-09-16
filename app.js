@@ -9,9 +9,30 @@ var cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 var session = require('express-session');
 const secret = 'secret';
+const roundTo = ('round-to');
+var mysql = require('mysql');
 
+var rn = require('random-number');
+var gen = rn.generator({
+    min:-10,
+    max:40,
+    interger:true
+})
 
+var temp = Math.round(gen());
+//var temp_round = roundTo( temp , 2 );
+console.log(temp);
 
+var con = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: ""
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+});
 
 // Initialize Firebase
 var config = {
@@ -124,21 +145,6 @@ app.post('/logout',function(req,res){
       }, function(error) {
         console.error('Sign Out Error', error);
       });
-      
-    /*firebase.auth().signOut()
-    .then(function(firebaseUser) {
-
-        console.log('signed out');
-        res.redirect('/');
-        
-    })
-    .catch(function(error){
-        
-        console.log('failed sign out')
-
-    })*/
-
-    //res.redirect('/');
 
 });
     
@@ -168,7 +174,6 @@ app.get('/signup',(req,res)=>{
 
 
 //Listen to auth state changes
-
 
 app.get('/',(req,res)=>{
     res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')})
