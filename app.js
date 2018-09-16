@@ -26,55 +26,40 @@ var hum_gen = rn.generator({
     interger:true
 });
 
-//var temp = Math.round(temp_gen());
-//var hum = Math.round(hum_gen());
-//console.log("temp",temp, "hum",hum);
-
 var url = 'mongodb://cassie:cassie1004@ds223542.mlab.com:23542/test-db'
 mongoose.Promise = global.Promise
 mongoose.connect(url);
-/*
-var obj = mongoose.model('object',{
-    temp:{type:Number},
-    hum:{type:Number},
-    email:{type:String}
-});
-*/
+
 var obj = mongoose.model('object',{
     email:String,
     livingroom:[{
         temp_liv:Number,
-        hum_liv:Number
+        hum_liv:Number,
+        time:String
     }],
     bedroom:[{
         temp_bed:Number,
-        hum_bed:Number
+        hum_bed:Number,
+        time:String
     }]
 
 })
-var newobj = new obj;
+
+
+
+var emails = mongoose.model('Emails',{
+    email:String
+})
+   
+var newobj = new obj();
+var newemail = new emails();
+
 /*
-var hi = new obj;
-hi.temp = 30;
-hi.hum = 99;
-hi.email = "cassie@bu.edu";
+var newtemp = setInterval(function(){
+    console.log(Math.round(temp_gen()))
+},5000);
 
-hi.save().then((doc)=>{
-    console.log('hi');
-},(e)=>{
-    console.log('err');
-});
 */
-/*
-obj.find({email:"cassie@bu.edu"},function(err,doc){
-    if(err){
-        return console.log('NO');
-    }
-    console.log('doc',doc);
-
-});
-*/
-
 // Initialize Firebase
 var config = {
     apiKey: "AIzaSyCp_U1pcNOVN26LitgZCyiac-aIeGI_zfE",
@@ -92,9 +77,6 @@ app.use(cookieParser());
 app.use(express.static(__dirname + '/files')); // USING CSS files in project
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
-//app.use(session({secret:"feaiosajfdklne1240",resave: false, saveUninitialized:true}));
-
-
 
 //Initialize Admin SDK
 
@@ -113,8 +95,39 @@ app.post('/registered', function(req,res){
     console.log(password);
     firebase.auth().createUserWithEmailAndPassword(txtEmail, password)
     .then(function(firbaseUser){
-        console.log(firbaseUser);
-            
+              var emailArray = [];      
+              emails.count({},function(err, count){
+              console.log( "Number of docs: ", count );
+              if(count === 0){
+                        newemail.email = txtEmail;
+                        newemail.save().then((doc1)=>{
+                        console.log('emails added');
+                    },(e)=>{
+                        console.log('err');
+                    });
+                    
+                }
+                else{
+                        emails.find({}, function(err, users){
+                        var userMap = {};
+                        users.forEach(function(user){
+                        userMap[user.email] = user;
+                        console.log(userMap);
+                        if(txtEmail !== user)
+                        {
+                            newemail.email = txtEmail;
+                            newemail.save().then((doc1)=>{
+                            console.log('new emails added');
+                            },(e)=>{
+                            console.log('err');
+                            });    
+                        }
+                          
+                        });
+                        console.log('check out emails');
+                    })
+                }       
+            });                
             newobj.email = txtEmail;
             newobj.livingroom.push({temp_liv:Math.round(temp_gen()),
                 hum_liv:Math.round(hum_gen())});
@@ -124,12 +137,15 @@ app.post('/registered', function(req,res){
             console.log('pushed info',newobj.bedroom.email);
             
             newobj.save().then((doc)=>{
+
                 console.log('room info entered');
                 console.log('info',doc);
+                
             },(e)=>{
                 console.log('err');
             });
-        res.redirect('/logged');
+            res.redirect('/logged');
+
     })
     .catch(function(error) {
         // Handle Errors here.
@@ -220,6 +236,8 @@ app.get('/signup',(req,res)=>{
 //Listen to auth state changes
 
 app.get('/',(req,res)=>{
+
+    
     res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')})
 });
 
