@@ -26,20 +26,33 @@ var hum_gen = rn.generator({
     interger:true
 });
 
-var temp = Math.round(temp_gen());
-var hum = Math.round(hum_gen());
-console.log("temp",temp, "hum",hum);
+//var temp = Math.round(temp_gen());
+//var hum = Math.round(hum_gen());
+//console.log("temp",temp, "hum",hum);
 
 var url = 'mongodb://cassie:cassie1004@ds223542.mlab.com:23542/test-db'
 mongoose.Promise = global.Promise
 mongoose.connect(url);
-
+/*
 var obj = mongoose.model('object',{
     temp:{type:Number},
     hum:{type:Number},
     email:{type:String}
 });
+*/
+var obj = mongoose.model('object',{
+    email:String,
+    livingroom:[{
+        temp_liv:Number,
+        hum_liv:Number
+    }],
+    bedroom:[{
+        temp_bed:Number,
+        hum_bed:Number
+    }]
 
+})
+var newobj = new obj;
 /*
 var hi = new obj;
 hi.temp = 30;
@@ -92,8 +105,6 @@ admin.initializeApp({
   databaseURL: "https://miniproject-35c0c.firebaseio.com"
 });
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 //Sign Up
 app.post('/registered', function(req,res){
     const txtEmail = req.body.email;
@@ -103,12 +114,16 @@ app.post('/registered', function(req,res){
     firebase.auth().createUserWithEmailAndPassword(txtEmail, password)
     .then(function(firbaseUser){
         console.log(firbaseUser);
-        var roominfo = new obj;
-            roominfo.temp = temp;
-            roominfo.hum = hum;
-            roominfo.email = txtEmail;
+            
+            newobj.email = txtEmail;
+            newobj.livingroom.push({temp_liv:Math.round(temp_gen()),
+                hum_liv:Math.round(hum_gen())});
+            newobj.bedroom.push({temp_bed:Math.round(temp_gen()),
+                hum_bed:Math.round(hum_gen())});
 
-            roominfo.save().then((doc)=>{
+            console.log('pushed info',newobj.bedroom.email);
+            
+            newobj.save().then((doc)=>{
                 console.log('room info entered');
                 console.log('info',doc);
             },(e)=>{
