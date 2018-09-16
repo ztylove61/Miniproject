@@ -14,15 +14,21 @@ var mongo = require('mongodb');
 var mongoose = require ('mongoose');
 var MongoClient = require('mongodb').MongoClient;
 var rn = require('random-number');
-var gen = rn.generator({
-    min:-10,
+var temp_gen = rn.generator({
+    min:10,
     max:40,
     interger:true
-})
+});
 
-var temp = Math.round(gen());
-//var temp_round = roundTo( temp , 2 );
-console.log(temp);
+var hum_gen = rn.generator({
+    min:0,
+    max:100,
+    interger:true
+});
+
+var temp = Math.round(temp_gen());
+var hum = Math.round(hum_gen());
+console.log("temp",temp, "hum",hum);
 
 var url = 'mongodb://cassie:cassie1004@ds223542.mlab.com:23542/test-db'
 mongoose.Promise = global.Promise
@@ -34,7 +40,8 @@ var obj = mongoose.model('object',{
     email:{type:String}
 });
 
-/*var hi = new obj;
+/*
+var hi = new obj;
 hi.temp = 30;
 hi.hum = 99;
 hi.email = "cassie@bu.edu";
@@ -43,8 +50,9 @@ hi.save().then((doc)=>{
     console.log('hi');
 },(e)=>{
     console.log('err');
-});*/
-
+});
+*/
+/*
 obj.find({email:"cassie@bu.edu"},function(err,doc){
     if(err){
         return console.log('NO');
@@ -52,9 +60,7 @@ obj.find({email:"cassie@bu.edu"},function(err,doc){
     console.log('doc',doc);
 
 });
-
-
-
+*/
 
 // Initialize Firebase
 var config = {
@@ -75,24 +81,6 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 //app.use(session({secret:"feaiosajfdklne1240",resave: false, saveUninitialized:true}));
 
-var stateCheck = (req,res,next)=> {
-
-    firebase.auth().onAuthStateChanged(firebaseUser => {
-        if(firebaseUser){
-               
-            // let expirationDate = Math.floor(Date.now()/1000)+30;
-            console.log('confirmed');
-            res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
-            
-        }
-        else{
-            console.log('logged out');
-            res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')});
-            
-        }
-    })
-    next();
-}
 
 
 //Initialize Admin SDK
@@ -103,8 +91,6 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://miniproject-35c0c.firebaseio.com"
 });
-
-
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -117,7 +103,18 @@ app.post('/registered', function(req,res){
     firebase.auth().createUserWithEmailAndPassword(txtEmail, password)
     .then(function(firbaseUser){
         console.log(firbaseUser);
-        res.redirect('/logged')
+        var roominfo = new obj;
+            roominfo.temp = temp;
+            roominfo.hum = hum;
+            roominfo.email = txtEmail;
+
+            roominfo.save().then((doc)=>{
+                console.log('room info entered');
+                console.log('info',doc);
+            },(e)=>{
+                console.log('err');
+            });
+        res.redirect('/logged');
     })
     .catch(function(error) {
         // Handle Errors here.
@@ -142,6 +139,7 @@ app.post('/login', function(req,res){
         console.log('logged in')
         var token = jwt.sign({userID:txtEmail},secret,{ expiresIn: '1h' });
         res.cookie('token',token);
+        res.cookie('emailsending',txtEmail);
             var isExpiredToken = false;
             var dateNow = new Date();
             console.log(token);
@@ -169,10 +167,11 @@ app.post('/logout',function(req,res){
       });
 
 });
-    
+
+//check if user logged in or not
 app.get('/logged',(req,res)=>{
 
-    console.log('token',req.cookies);
+    console.log('token and email',req.cookies);
     jwt.verify(req.cookies.token, 'secret', function(err, decoded) {
         // err
         if(err){
@@ -182,6 +181,14 @@ app.get('/logged',(req,res)=>{
             
         }else{
             console.log('confirmed');
+            obj.find({email:req.cookies.emailsending},function(err,doc){
+                if(err){
+                    return console.log('NO');
+                }
+                console.log('doc',doc);
+            
+            });
+            
             res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
         }
         // decoded undefined
