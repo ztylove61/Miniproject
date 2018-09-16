@@ -10,8 +10,9 @@ const jwt = require('jsonwebtoken');
 var session = require('express-session');
 const secret = 'secret';
 const roundTo = ('round-to');
-var mysql = require('mysql');
-
+var mongo = require('mongodb');
+var mongoose = require ('mongoose');
+var MongoClient = require('mongodb').MongoClient;
 var rn = require('random-number');
 var gen = rn.generator({
     min:-10,
@@ -23,16 +24,37 @@ var temp = Math.round(gen());
 //var temp_round = roundTo( temp , 2 );
 console.log(temp);
 
-var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: ""
+var url = 'mongodb://cassie:cassie1004@ds223542.mlab.com:23542/test-db'
+mongoose.Promise = global.Promise
+mongoose.connect(url);
+
+var obj = mongoose.model('object',{
+    temp:{type:Number},
+    hum:{type:Number},
+    email:{type:String}
 });
 
-con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected!");
+/*var hi = new obj;
+hi.temp = 30;
+hi.hum = 99;
+hi.email = "cassie@bu.edu";
+
+hi.save().then((doc)=>{
+    console.log('hi');
+},(e)=>{
+    console.log('err');
+});*/
+
+obj.find({email:"cassie@bu.edu"},function(err,doc){
+    if(err){
+        return console.log('NO');
+    }
+    console.log('doc',doc);
+
 });
+
+
+
 
 // Initialize Firebase
 var config = {
