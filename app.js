@@ -7,13 +7,14 @@ var router = express.Router();
 var admin = require("firebase-admin");
 var cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
-var session = require('express-session');
 const secret = 'secret';
 const roundTo = ('round-to');
 var mongo = require('mongodb');
 var mongoose = require ('mongoose');
+var plotly = require('plotly')("cassielee04","uAi8BnsPWVUvBLBjjW0Z");
 var MongoClient = require('mongodb').MongoClient;
 var rn = require('random-number');
+var date = require('date-and-time');
 var temp_gen = rn.generator({
     min:10,
     max:40,
@@ -45,13 +46,11 @@ var obj = mongoose.model('object',{
 
 })
 
-
-
 var emails = mongoose.model('Emails',{
     email:String
 })
    
-var newobj = new obj();
+
 var newemail = new emails();
 
 /*
@@ -119,7 +118,9 @@ app.post('/registered', function(req,res){
                             newemail.save().then((doc1)=>{
                             console.log('new emails added');
                             },(e)=>{
-                            console.log('err');
+
+                                //console.log('err');
+
                             });    
                         }
                           
@@ -127,23 +128,29 @@ app.post('/registered', function(req,res){
                         console.log('check out emails');
                     })
                 }       
-            });                
-            newobj.email = txtEmail;
-            newobj.livingroom.push({temp_liv:Math.round(temp_gen()),
-                hum_liv:Math.round(hum_gen())});
-            newobj.bedroom.push({temp_bed:Math.round(temp_gen()),
-                hum_bed:Math.round(hum_gen())});
-
-            console.log('pushed info',newobj.bedroom.email);
-            
-            newobj.save().then((doc)=>{
-
-                console.log('room info entered');
-                console.log('info',doc);
-                
-            },(e)=>{
-                console.log('err');
             });
+            for(let i = 0 ; i < 10 ; i++)
+            {
+                var newobj = new obj();   
+                newobj.email = txtEmail;
+                newobj.livingroom.push({temp_liv:Math.round(temp_gen()),
+                    hum_liv:Math.round(hum_gen())});
+                newobj.bedroom.push({temp_bed:Math.round(temp_gen()),
+                    hum_bed:Math.round(hum_gen())});
+
+              
+                //console.log(times);
+                console.log('pushed info',newobj.bedroom.email);
+                
+                newobj.save().then((doc)=>{
+
+                    console.log('room info entered');
+                    console.log('info',doc);
+                    
+                },(e)=>{
+                    //console.log('err');
+                });
+            }
             res.redirect('/logged');
 
     })
@@ -216,7 +223,71 @@ app.get('/logged',(req,res)=>{
                 if(err){
                     return console.log('NO');
                 }
-                console.log('doc',doc);
+                else{
+
+                    var livingroomT = [];
+                    var bedroomT =[];
+                    var livingroomH = [];
+                    var bedroomH = [];
+                    //console.log(doc);
+                    
+                    doc.forEach(function(data){
+                        var arraylivT = data.livingroom[0];
+                        var arraybedT = data.bedroom[0];
+                        var arraylivH = data.livingroom[0];
+                        var arraybedH = data.bedroom[0];
+                        livingroomT.push(arraylivT.temp_liv);
+                        bedroomT.push(arraybedT.temp_bed);
+                        livingroomH.push(arraylivH.hum_liv);
+                        bedroomH.push(arraybedH.hum_bed);
+
+                    });
+                    var temp_liv_datas = {
+                        x:[0,1,2,3,4,5,6,7,8,9],
+                        y:livingroomT,
+                        name:'Temperature(Celcius)',
+                        type: "scatter"
+                    };
+
+                    var hum_liv_datas = {
+                        x:[0,1,2,3,4,5,6,7,8,9],
+                        y:livingroomH,
+                        name:'Humidity(%)',
+                        type: "bar"
+                    };
+
+                    var layout_living = {
+                        title: 'Livingroom Info',
+                        xaxis:{
+                            title:'time',
+                            titlefont:{
+                                family:'Courier New, monospace',
+                                size: 18,
+                                color: '#7f7f7f'
+                            }
+
+                        },
+
+                        yaxis:{
+                            title: 'Temperature and Humidity',
+                            titlefont: {
+                                family: 'Courier New, monospace',
+                                size: 18,
+                                color: '#CD5C5C'
+                              }
+                        }
+                    };
+                    
+            
+                    
+                    var liv_data = [temp_liv_datas,hum_liv_datas];
+                    var graphOptions = {filename: "bar-line", fileopt: "overwrite"};
+                    plotly.plot(liv_data, graphOptions, function (err, msg) {
+                    console.log(msg);
+                    });
+
+                    console.log(livingroomH, bedroomH,livingroomT, bedroomT)
+                }
             
             });
             
