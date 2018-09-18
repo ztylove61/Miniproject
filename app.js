@@ -77,6 +77,7 @@ var serviceAccount = require("./miniproject-35c0c-firebase-adminsdk-l7ec7-89f998
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://miniproject-35c0c.firebaseio.com"
+
 });
 */
 //Sign Up
@@ -85,9 +86,17 @@ app.post('/registered', function(req,res){
     const password = req.body.password;
     firebase.auth().createUserWithEmailAndPassword(txtEmail, password)
     .then(function(firbaseUser){
-              var emailArray = [];      
+              var emailArray = []; 
+              var dateNow = new Date();
+              var dateYear = dateNow.getFullYear();
+              var dateMonth = dateNow.getMonth();
+              var dateDay = dateNow.getDay();     
               emails.count({},function(err, count){
               
+              //var parsed = dateYear + '-' + dateMonth + '-' + dateDay;
+
+              
+
               if(count === 0){
                         newemail.email = txtEmail;
                         newemail.save().then((doc1)=>{
@@ -121,18 +130,20 @@ app.post('/registered', function(req,res){
                 }       
             });
             for(let i = 0 ; i < 10 ; i++)
-            {
+            {   
+                
+
+                dateDay = dateDay + 1;
+                var parsed = dateYear + '-' + dateMonth + '-' + dateDay;
                 var newobj = new obj();   
                 newobj.email = txtEmail;
                 newobj.livingroom.push({temp_liv:Math.round(temp_gen()),
-                    hum_liv:Math.round(hum_gen())});
+                    hum_liv:Math.round(hum_gen()),time:parsed});
                 newobj.bedroom.push({temp_bed:Math.round(temp_gen()),
-                    hum_bed:Math.round(hum_gen())});
+                    hum_bed:Math.round(hum_gen()),time:parsed});
 
               
-                //console.log(times);
-                //console.log('pushed info',newobj.bedroom.email);
-                
+
                 newobj.save().then((doc)=>{
 
                     
@@ -206,75 +217,84 @@ app.get('/logged',(req,res)=>{
             console.log('confirmed');
             console.log('decoded: ',decoded);
             var Email = decoded.userID;
-            obj.find({Email},function(err,doc){
+            console.log(Email);
+            obj.find({email:Email},function(err,doc){
                 if(err){
 
                     return console.log('NO');
                 }
                 else{
-
+                    console.log('doc',doc);
                     var livingroomT = [];
                     var bedroomT =[];
                     var livingroomH = [];
                     var bedroomH = [];
-                    //console.log(doc);
-                    
+                    var timeArray = [];
                     doc.forEach(function(data){
                         var arraylivT = data.livingroom[0];
                         var arraybedT = data.bedroom[0];
                         var arraylivH = data.livingroom[0];
                         var arraybedH = data.bedroom[0];
+                        var arrayTime = data.livingroom[0];
                         livingroomT.push(arraylivT.temp_liv);
                         bedroomT.push(arraybedT.temp_bed);
                         livingroomH.push(arraylivH.hum_liv);
                         bedroomH.push(arraybedH.hum_bed);
+                        timeArray.push(arrayTime.time);
+                        
 
                     });
+                    timeArray.sort(function(a, b){
+                        var nums1 = a.split('-');
+                        var nums2 = b.split('-');
+                        var numcon1 = Number(nums1[2]);
+                        var numcon2 = Number(nums2[2]);
+                        console.log(nums1,nums2);
+                        return numcon1 > numcon2;
+                    });
+                    console.log(timeArray);
                     var temp_liv_datas = {
-                        x:[0,1,2,3,4,5,6,7,8,9],
+                        x:timeArray,
                         y:livingroomT,
                         name:'Temperature(Celcius)',
+                        fill: 'tozeroy',
                         type: "scatter"
                     };
 
                     var hum_liv_datas = {
-                        x:[0,1,2,3,4,5,6,7,8,9],
+                        x:timeArray,
                         y:livingroomH,
                         name:'Humidity(%)',
-                        type: "bar"
+                        fill:'tonexty',
+                        type: "scatter"
                     };
 
                     var layout_living = {
                         title: 'Livingroom Info',
-                        xaxis:{
-                            title:'time',
-                            titlefont:{
-                                family:'Courier New, monospace',
-                                size: 18,
-                                color: '#7f7f7f'
-                            }
-
+                        autosize:false,
+                        width:700,
+                        height:700,
+                        margin:{
+                            l:50,
+                            r:50,
+                            b:100,
+                            t:100,
+                            pad:4
                         },
-
-                        yaxis:{
-                            title: 'Temperature and Humidity',
-                            titlefont: {
-                                family: 'Courier New, monospace',
-                                size: 18,
-                                color: '#CD5C5C'
-                              }
-                        }
+                        paper_bgcolor:'#ffffff',
+                        plot_bgcolor:'#ffffff'
+                        
                     };
                     
-            
+                    console.log(timeArray);
                     
                     var liv_data = [temp_liv_datas,hum_liv_datas];
-                    var graphOptions = {filename: "bar-line", fileopt: "overwrite"};
+                    var graphOptions = {layout:layout_living, filename: "bar-line", fileopt: "overwrite"};
                     plotly.plot(liv_data, graphOptions, function (err, msg) {
                     console.log(msg);
                     });
 
-                    console.log(livingroomH, bedroomH,livingroomT, bedroomT)
+                    
                 }
             
             });
