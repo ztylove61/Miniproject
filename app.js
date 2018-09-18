@@ -4,7 +4,6 @@ var app = express();
 var path = require('path');
 var firebase = require ('firebase');
 var router = express.Router();
-//var admin = require("firebase-admin");
 var cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const secret = 'secret';
@@ -15,6 +14,7 @@ var plotly = require('plotly')("cassielee04","uAi8BnsPWVUvBLBjjW0Z");
 var MongoClient = require('mongodb').MongoClient;
 var rn = require('random-number');
 var date = require('date-and-time');
+var popupTools = require('popup-tools');
 var temp_gen = rn.generator({
     min:10,
     max:40,
@@ -67,19 +67,11 @@ firebase.initializeApp(config);
 //Middleware
 app.use(cookieParser());
 app.use(express.static(__dirname + '/files')); // USING CSS files in project
+//app.use(express.static(__dirname + '/files/css')); 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
-
-//Initialize Admin SDK
-/*
-var serviceAccount = require("./miniproject-35c0c-firebase-adminsdk-l7ec7-89f99871ca.json");
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://miniproject-35c0c.firebaseio.com"
-
-});
-*/
+app.set('view engine', 'pug');
+app.set('files', path.join(__dirname, '/files'));
 //Sign Up
 app.post('/registered', function(req,res){
     const txtEmail = req.body.email;
@@ -93,10 +85,6 @@ app.post('/registered', function(req,res){
               var dateDay = dateNow.getDay();     
               emails.count({},function(err, count){
               
-              //var parsed = dateYear + '-' + dateMonth + '-' + dateDay;
-
-              
-
               if(count === 0){
                         newemail.email = txtEmail;
                         newemail.save().then((doc1)=>{
@@ -180,12 +168,14 @@ app.post('/login', function(req,res){
     .then(function(user){
         console.log('logged in')
         var token = jwt.sign({userID:txtEmail},secret,{ expiresIn: '1h' });
+        console.log('hi cassie');
         res.cookie('token',token);
-        //res.cookie('emailsending',txtEmail);
+        console.log('token after',token);
         res.redirect('/logged');
+        
     })
-    .catch(e=>console.log(e))
-    
+    .catch(e=>res.render(__dirname + '/files/html/index2.pug',{title: 'Invalid', message: 'Invalid', errors: 'Invalid Username or Password'}))
+        //res.render(__dirname + '/files/html/index2.pug',{title: 'Invalid', message: 'Invalid', errors: 'Invalid Username or Password'});
         
 });
 
@@ -291,7 +281,11 @@ app.get('/logged',(req,res)=>{
                     var liv_data = [temp_liv_datas,hum_liv_datas];
                     var graphOptions = {layout:layout_living, filename: "bar-line", fileopt: "overwrite"};
                     plotly.plot(liv_data, graphOptions, function (err, msg) {
+                        if(err){
+                            console.log(err);
+                        }
                     console.log(msg);
+
                     });
 
                     
@@ -314,10 +308,9 @@ app.get('/signup',(req,res)=>{
 
 //Listen to auth state changes
 
-app.get('/',(req,res)=>{
-
-    
-    res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')})
+app.get('/',(req,res)=>{    
+    //res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')})
+    res.render(__dirname + '/files/html/index2.pug');
 });
 
 
