@@ -1,42 +1,41 @@
 <html>
     <head>
     <link rel="stylesheet" href="css/loggedin.css">    
-    <!-- Firebase App is always required and must be first -->
+    //- <!-- Firebase App is always required and must be first -->
     <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-app.js"></script>
 
-    <!-- Add additional services that you want to use -->
+    //- <!-- Add additional services that you want to use -->
     <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-messaging.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-functions.js"></script>    
     <body>
+        <header>
+            <div class="row">
+                <div class="logo">
+                    <img src="img/Original.jpg" alt="Logo" width="300" height="85">
+        </header>
         <div class = "container">
             <form >
-                <h1>iTempTracker</h1>
                 <header>
-                        <div class = "row" style="text-align: center">
-                            <ul class = "main-nav">
-                                <button formaction = "/" formmethod = "GET"> HOME</button>
-                                <!-- <li><a href=""> HELP </a> </li> -->
-                                <!-- <li><a href=""> XXXX </a> </li> -->
-                                <!-- <li><a href=""> XXXX </a> </li> -->
-                            </ul>
-                        </div>
+                    <div class = "row" style="text-align: center">                   
+                        <button class = "btn_home" formaction = "/" formmethod = "GET"> HOME</button>
+                    </div>
                 </header>
-                <h2>make you a better home</h2>
                 <br>
                 <br>
                 <br>
-                <div style = "text-align: center">
+                <h2><b>#{username} 's Livingroom Information</b></h2>
+                <div style = "text-align: center; margin-top:30px">
                     <a href="https://plot.ly/~cassielee04/4/?share_key=Oicwy1QgIvTHhj4fOWnIzq" target="_blank" title="bar-line" style="display: block; text-align: center;"><img src="https://plot.ly/~cassielee04/4.png?share_key=Oicwy1QgIvTHhj4fOWnIzq" alt="bar-line" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
                     <script data-plotly="cassielee04:4" sharekey-plotly="Oicwy1QgIvTHhj4fOWnIzq" src="https://plot.ly/embed.js" async></script>
                 </div> 
                 <br>
                 <br>   
-                    <button class = "" style = "margin-left: 450px" name= "signout" id="signout" formaction = "/logout" formmethod = "POST">
-                        <h2>Sign Out </h2>
-                    </button>
+                <button class = "btn_form" style = "margin-left: 450px; margin-top:-30px" name= "signout" id="signout" formaction = "/logout" formmethod = "POST">
+                    <h3>Sign Out </h3>
+                </button>
             </form>
         </div>
 

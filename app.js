@@ -121,7 +121,6 @@ app.post('/registered', function(req,res){
             for(let i = 0 ; i < 10 ; i++)
             {   
                 
-
                 dateDay = dateDay + 1;
                 var parsed = dateYear + '-' + dateMonth + '-' + dateDay;
                 var newobj = new obj();   
@@ -130,8 +129,6 @@ app.post('/registered', function(req,res){
                     hum_liv:Math.round(hum_gen()),time:parsed});
                 newobj.bedroom.push({temp_bed:Math.round(temp_gen()),
                     hum_bed:Math.round(hum_gen()),time:parsed});
-
-              
 
                 newobj.save().then((doc)=>{
                 
@@ -145,7 +142,7 @@ app.post('/registered', function(req,res){
             res.redirect('/logged');
 
     })
-    .catch(e=>res.render(__dirname + '/files/html/SignUp.pug',{title: 'Invalid', message: 'Invalid', errors: 'Existing Username or Password'}))
+    .catch(e=>res.render(__dirname + '/files/html/SignUp.pug',{title: 'Invalid', message: 'Invalid', errors: e.message}))
         // Handle Errors here.
    
 })
@@ -201,6 +198,8 @@ app.get('/logged',(req,res)=>{
             console.log('confirmed');
             console.log('decoded: ',decoded);
             var Email = decoded.userID;
+            var split = Email.split("@");
+            var username = split[0];
             console.log(Email);
             obj.find({email:Email},function(err,doc){
                 if(err){
@@ -286,8 +285,11 @@ app.get('/logged',(req,res)=>{
                 }
             
             });
+
+
             
-            res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
+            //res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
+            res.render(__dirname + '/files/html/loggedin.pug',{username:username});
         }
         // decoded undefined
       });
@@ -296,7 +298,7 @@ app.get('/logged',(req,res)=>{
 
 
 app.get('/signup',(req,res)=>{
-    res.sendFile('SignUp.html',{root: path.join(__dirname,'./files/html')})
+    res.render(__dirname + '/files/html/SignUp.pug')
 });
 
 
