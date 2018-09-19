@@ -17,7 +17,8 @@ body{
 	line-height: 24px;
 	word-wrap: break-word;
 	-ms-word-wrap: break-word;
-	background-image: linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)), url(woods.jpg);
+	/* background-image: linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)), url(woods.jpg); */
+	background-color: #bebebe
 }
 
 h1,h2{

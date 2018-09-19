@@ -72,6 +72,8 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.set('view engine', 'pug');
 app.set('files', path.join(__dirname, '/files'));
+
+
 //Sign Up
 app.post('/registered', function(req,res){
     const txtEmail = req.body.email;
@@ -106,7 +108,6 @@ app.post('/registered', function(req,res){
                         newemail.save().then((doc1)=>{
                         
                         },(e)=>{
-
                             //console.log('err');
 
                         });    
@@ -133,9 +134,7 @@ app.post('/registered', function(req,res){
               
 
                 newobj.save().then((doc)=>{
-
-                    
-                    
+                
                 },(e)=>{
                     //console.log('err');
                 });
@@ -146,14 +145,9 @@ app.post('/registered', function(req,res){
             res.redirect('/logged');
 
     })
-    .catch(function(error) {
+    .catch(e=>res.render(__dirname + '/files/html/SignUp.pug',{title: 'Invalid', message: 'Invalid', errors: 'Existing Username or Password'}))
         // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.log(errorMessage);
-            
-      });
-
+   
 })
 
 //Sign In
@@ -200,7 +194,7 @@ app.get('/logged',(req,res)=>{
         if(err){
 
             console.log('logged out');
-            res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')});
+            res.sendFile('home.html',{root: path.join(__dirname,'./files/html')});
             
         }else{
             
@@ -284,7 +278,7 @@ app.get('/logged',(req,res)=>{
                         if(err){
                             console.log(err);
                         }
-                    console.log(msg);
+                        console.log(msg);
 
                     });
 
@@ -308,11 +302,17 @@ app.get('/signup',(req,res)=>{
 
 //Listen to auth state changes
 
-app.get('/',(req,res)=>{    
-    //res.sendFile('index2.html',{root: path.join(__dirname,'./files/html')})
+app.get('/signin',(req,res)=>{    
+    //res.sendFile('home.html',{root: path.join(__dirname,'./files/html')})
+    console.log('Im Here');
     res.render(__dirname + '/files/html/index2.pug');
 });
 
+app.get('/',(req,res)=>{ 
+     
+    res.sendFile('home.html',{root: path.join(__dirname,'./files/html')})
+    //res.render(__dirname + '/files/html/home.html');
+});
 
 app.listen(3000,() => {
     console.log('Starting on port 3000');
