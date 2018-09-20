@@ -3,7 +3,7 @@
 Description of iTempTracker 
 --------------------------
 The project is a home temperature & Humidity tracking website,
-where you can login to your account and check your personal status easily.
+where user can login to your account and check your personal status easily.
 Supporting multiple usersby having our own database in mongodb.      
 
 Getting Started
@@ -51,6 +51,8 @@ Once the user is logged in, the specific data that corresponds to the user will 
 ![Alt text](/files/img/profile.png?raw=true "signin")
 
 
+Diagram
+---------
 
 
 
@@ -59,32 +61,69 @@ Languages and Tools
 -------------------
 
 ### Node Js and Express
+Javascript was used as a mainn language and Node JS, Express were used as framework for the web application.
 
 
 ### HTML, pug and CSS
 
-For the UI design, we used HTML web page,
-used hyperlink to connect each sites,
-used .css files to create the front-end design,
-use .active function to make simple animates.
+HTML and PUG pages are main UI design. In both languages, POST or GET method to connect with other pages,
+For more professional UI design, the app used reference from existing bootstrap template for .css and .html file is used at this web. Some of the pages we used .pug files in order to correspond with app.js file. 
 
-### Firebase Authentication 
+### Firebase Authentication (API) 
+The App uses Firebase Authentication to allow users to sign in to the app using email and assword methods. 
+In order to connect app to firebase, installing the Firebase SDK is first part. [Installing Firebase SDK]
+(https://github.com/facebook/react/wiki/Sites-Using-React)
 
-### JWT Token
+#### When the new user Sign Up
+When signing up new users, the firebase function creates a form that allows anew users to register with yhe app using their email and password
+            
+                firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+                 });
+             
+#### When the user Sign In
+Firebase creates a form that allows cxisting users to sign in using created email and password when users registered, when the user completes the form
+        
+                firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+                });
 
-### MongoDB and mLAB
+### JWT Token (JSON Web Token) 
+The app uses JWT Token for managing user private route. When user first signs into the authentication server using the firebase authentication login system, the server creates the JWT and send it to user. When user logs in the server verifies incoming jwt token that is created by authentication server. If the token verified, the user can see his/her profile page. 
+If not, the user will go back to the sign in page.
+
+### MongoDB and mLAB (Cloud Database Service)
+For saving and extracting user-specific data, the web-application uses mLab which is a cloud database based upon MongoDB.
+When the client signs up to the website, the webserver saves the user object (Consisted of email,temperature data, and  humidity data) into the connected mLab database for further use. As the user enters the profile page, the webserver queries the data by the user's email address and extracts the enviromental data for plotting.
+
+    var obj = mongoose.model('object',{
+        email:String,
+        livingroom:[{
+            temp_liv:Number,
+            hum_liv:Number,
+            time:String
+        }],
+        bedroom:[{
+            temp_bed:Number,
+            hum_bed:Number,
+            time:String
+        }]
+
+    })
+
+
 
 ### Plotly
 
 
-### Contributor
-
+Contributor
+------------
 Seung Hee Lee(cassielee04): user Authentication, mongoDB mLab integration with server, DB plotting (Backend Developer)
 seunghee@bu.edu 
 
 Tianyu Zhang(ztylove61) : Page design, Creatging HTML and CSS files, Button Design, (Frontend Developer)             
 ztyluv@bu.edu     
 
-### Reference
+Reference
+-------------
+https://firebase.google.com/docs/auth/web/start
 
 
