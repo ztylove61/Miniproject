@@ -224,7 +224,6 @@ app.get('/logged',(req,res)=>{
                         livingroomH.push(arraylivH.hum_liv);
                         bedroomH.push(arraybedH.hum_bed);
                         timeArray.push(arrayTime.time);
-                        
 
                     });
                     timeArray.sort(function(a, b){
@@ -286,8 +285,6 @@ app.get('/logged',(req,res)=>{
             
             });
 
-
-            
             //res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
             res.render(__dirname + '/files/html/loggedin.pug',{username:username});
         }

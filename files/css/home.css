@@ -23,7 +23,7 @@ header{
 }
 
 .main-nav li a{
-    color: whitesmoke;
+    color: #444444;
     text-decoration: aquamarine;
     padding: 5px 20px;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
@@ -31,7 +31,7 @@ header{
 }
 
 .main-nav li.active a{
-    border: 1px solid white;
+    border: 1px solid #444444;
 
 }
 
