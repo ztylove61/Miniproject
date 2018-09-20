@@ -58,7 +58,8 @@ Once the user is logged in, the specific data that corresponds to the user will 
 Languages and Tools 
 -------------------
 
-### Node Js 
+### Node Js and Express
+
 
 ### HTML, pug and CSS
 
@@ -67,13 +68,23 @@ used hyperlink to connect each sites,
 used .css files to create the front-end design,
 use .active function to make simple animates.
 
+### Firebase Authentication 
+
+### JWT Token
+
+### MongoDB and mLAB
+
+### Plotly
+
 
 ### Contributor
 
-Seung Hee Lee(cassielee04)
+Seung Hee Lee(cassielee04): user Authentication, mongoDB mLab integration with server, DB plotting (Backend Developer)
 seunghee@bu.edu 
 
-Tianyu Zhang(ztylove61)             
+Tianyu Zhang(ztylove61) : Page design, Creatging HTML and CSS files, Button Design, (Frontend Developer)             
 ztyluv@bu.edu     
 
 ### Reference
+
+
