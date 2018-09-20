@@ -283,10 +283,7 @@ app.get('/logged',(req,res)=>{
                 }
             
             });
-
-            //res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
-            
-            //return res.redirect('/logged');
+;
         }
         // decoded undefined
       });
