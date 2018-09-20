@@ -53,7 +53,11 @@ Once the user is logged in, the specific data that corresponds to the user will 
 
 Diagram
 ---------
+Here is the logic behind the app
 
+
+
+![Alt text](/files/img/diagram.png?raw=true "diagram")
 
 
      
@@ -112,6 +116,11 @@ When the client signs up to the website, the webserver saves the user object (Co
 
 
 ### Plotly
+In order to plot user data, the app uses library called Plotly. 
+Plotly recieves data when user creates the account. When the user login the profile data, plotly shows temperature and humidity information about user room.
+
+![Alt text](/files/img/datas.png?raw=true "datas.png")
+
 
 
 Contributor
@@ -124,6 +133,10 @@ ztyluv@bu.edu
 
 Reference
 -------------
+https://www.npmjs.com/
 https://firebase.google.com/docs/auth/web/start
+https://colorlib.com/wp/free-bootstrap-registration-forms/
+https://plot.ly/products/dash/
+
 
 
