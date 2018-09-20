@@ -15,6 +15,7 @@ var MongoClient = require('mongodb').MongoClient;
 var rn = require('random-number');
 var date = require('date-and-time');
 var popupTools = require('popup-tools');
+
 var temp_gen = rn.generator({
     min:10,
     max:40,
@@ -139,7 +140,7 @@ app.post('/registered', function(req,res){
 
             var token = jwt.sign({userID:txtEmail},secret,{ expiresIn: '1h' });
             res.cookie('token',token);
-            res.redirect('/logged');
+            return res.redirect('/logged');
 
     })
     .catch(e=>res.render(__dirname + '/files/html/SignUp.pug',{title: 'Invalid', message: 'Invalid', errors: e.message}))
@@ -191,7 +192,7 @@ app.get('/logged',(req,res)=>{
         if(err){
 
             console.log('logged out');
-            res.sendFile('home.html',{root: path.join(__dirname,'./files/html')});
+            return res.sendFile('home.html',{root: path.join(__dirname,'./files/html')});
             
         }else{
             
@@ -271,22 +272,21 @@ app.get('/logged',(req,res)=>{
                     console.log(timeArray);
                     
                     var liv_data = [temp_liv_datas,hum_liv_datas];
-                    var graphOptions = {layout:layout_living, filename: "bar-line", fileopt: "overwrite"};
+                    var graphOptions = {layout:layout_living, filename: "bar-line", fileopt: "overwrite"};      
                     plotly.plot(liv_data, graphOptions, function (err, msg) {
                         if(err){
                             console.log(err);
                         }
-                        console.log(msg);
-
+                        console.log(msg);res.render(__dirname + '/files/html/loggedin.pug',{username:username});
                     });
-
-                    
+                   
                 }
             
             });
 
             //res.sendFile('loggedin.html',{root: path.join(__dirname,'./files/html')})
-            res.render(__dirname + '/files/html/loggedin.pug',{username:username});
+            
+            //return res.redirect('/logged');
         }
         // decoded undefined
       });
