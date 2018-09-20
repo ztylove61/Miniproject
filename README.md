@@ -1,6 +1,6 @@
 # Miniproject
 senior project-miniproject 
-Tianyu Zhang & Seung Hee Lee
+Seung Hee Lee & Tianyu Zhang
 
 For opening this project, tape node.js in the command line,
 then open a blank website page, open localhost:3000,
