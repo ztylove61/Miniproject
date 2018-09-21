@@ -125,18 +125,18 @@ Plotly recieves data when user creates the account. When the user login the prof
 
 Contributor
 ------------
-Seung Hee Lee(cassielee04): user Authentication, mongoDB mLab integration with server, DB plotting (Backend Developer)
+Seung Hee Lee(cassielee04): user Authentication, mongoDB mLab integration with server, DB plotting (Backend Developer)<b>
 seunghee@bu.edu 
 
-Tianyu Zhang(ztylove61) : Page design, Creatging HTML and CSS files, Button Design, (Frontend Developer)             
+Tianyu Zhang(ztylove61) : Page design, Creatging HTML and CSS files, Button Design, (Frontend Developer)<b>             
 ztyluv@bu.edu     
 
 Reference
 -------------
-https://www.npmjs.com/
-https://firebase.google.com/docs/auth/web/start
-https://colorlib.com/wp/free-bootstrap-registration-forms/
-https://plot.ly/products/dash/
+https://www.npmjs.com/ <b>
+https://firebase.google.com/docs/auth/web/start <b>
+https://colorlib.com/wp/free-bootstrap-registration-forms/ <b>
+https://plot.ly/products/dash/<b>
 
 
 
