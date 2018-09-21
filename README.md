@@ -125,10 +125,10 @@ Plotly recieves data when user creates the account. When the user login the prof
 
 Contributor
 ------------
-Seung Hee Lee(cassielee04): user Authentication, mongoDB mLab integration with server, DB plotting (Backend Developer)<b>
+Seung Hee Lee(cassielee04): user Authentication, mongoDB mLab integration with server, DB plotting (Backend Developer)
 seunghee@bu.edu 
 
-Tianyu Zhang(ztylove61) : Page design, Creatging HTML and CSS files, Button Design, (Frontend Developer)<b>             
+Tianyu Zhang(ztylove61) : Page design, Creatging HTML and CSS files, Button Design, (Frontend Developer)
 ztyluv@bu.edu     
 
 Reference
